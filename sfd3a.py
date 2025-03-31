@@ -12,7 +12,7 @@ st.title("Combined Solar Dashboard")
 
 st.markdown("""
 <div style="width:100%; overflow:hidden;">
-  <img src="banner.png" style="width:100%; height:auto;">
+  <img src="Logo.png" style="width:100%; height:auto;">
 </div>
 """, unsafe_allow_html=True)
 
