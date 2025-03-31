@@ -182,6 +182,7 @@ with tab_customer:
     # ---------------------------
     # Render the PDF-like Lease/Loan Output Layout
     # ---------------------------
+    st.markdown("<div style='color: red;'>Hello World</div>", unsafe_allow_html=True)
     st.markdown(f"""
     <div style="display: flex; flex-direction: column; font-family: Arial, sans-serif; color: #333;">
 
