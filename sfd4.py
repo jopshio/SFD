@@ -11,10 +11,10 @@ import textwrap
 # Page & Title Configuration
 # ---------------------------
 st.set_page_config(page_title="Combined Solar Dashboard", layout="wide")
-st.title("Combined Solar Dashboard")
+
 st.markdown("""
 <div style="width:100%; overflow:hidden;">
-  <img src="https://raw.githubusercontent.com/jopshio/sfd/main/Logo.png" style="width:200%; max-height:200px; object-fit: contain;">
+  <img src="https://raw.githubusercontent.com/jopshio/sfd/main/Logo.png" style="width:200%; max-height:300px; object-fit: contain;">
 </div>
 """, unsafe_allow_html=True)
 # ---------------------------
@@ -102,7 +102,7 @@ with tab_customer:
     discounted_project_cost = (base_price + roof_cost) * (1 - project_discount_pct / 100)
     nys_incentive = system_size_kw * 1000 * 0.2
 
-    # Use discounted project cost as loan amount for customer calculations
+    # Use discounted project cost as loan amount
     loan_amount_customer = discounted_project_cost
     monthly_payment_selected = abs(pmt(loan_apr_cust / 100 / 12, loan_term_cust * 12, loan_amount_customer))
 
@@ -120,34 +120,33 @@ with tab_customer:
     }
     output_summary = {
         'Prepared For': f"Investment Overview prepared for {customer_name}",
-        'Selected Loan Program': f"{loan_term_cust} Years | APR: {loan_apr_cust:.2f}% | Dealer Fee: {dealer_fee_cust:.2f}%",
+        'Loan Terms': f"{loan_term_cust} Years | APR: {loan_apr_cust:.2f}% | Dealer Fee: {dealer_fee_cust:.2f}%",
         'Monthly Payment': f"${monthly_payment_selected:,.2f}",
         'Cash Total': f"${cash['Total Cost']:.2f}",
         'Project Discount': f"{project_discount_pct}%"
     }
 
     # ---------------------------
-    # Payment Schedule Calculations
+    # Payment Schedule Calculations (using values from the dropdown)
     # ---------------------------
     current_date_str = datetime.date.today().strftime("%b %d, %Y")
-    system_cost = base_price                # System cost before discount
-    spring_discount = roof_cost             # "Spring Discount" value (using roof_cost)
+    system_cost = base_price                # System cost (before discount)
+    spring_discount = roof_cost             # "Spring Discount" value
     itc_val = system_cost * 0.30             # 30% Federal Tax Credit (ITC)
-    nys_credit_val = 5000                   # State Tax Credit (could be dynamic)
-    nyc_abatement_val = 34356               # NYC Abatement (could be dynamic)
+    nys_credit_val = 5000                   # State Tax Credit
+    nyc_abatement_val = 34356               # NYC Abatement
 
-    # Loan amounts for each scenario:
+    # Calculate loan amounts for each scenario:
     loan_amount_no_incentives = loan_amount_customer
     loan_amount_itc = loan_amount_customer - itc_val
     loan_amount_incentives = loan_amount_customer - (itc_val + nys_credit_val + nyc_abatement_val)
 
-    # Loan parameters
+    # Loan parameters from the dropdown:
     r = loan_apr_cust / 100 / 12            # Monthly interest rate
     n = loan_term_cust * 12                 # Total number of months
 
-    # For each scenario, recalc payment based on deferral:
+    # If deferral is enabled, compound the principal for 3 months and recalc payment
     if deferral_option:
-        # New principal after 3 months of accrued interest:
         new_principal_no_incentives = loan_amount_no_incentives * (1 + r) ** 3
         new_principal_itc = loan_amount_itc * (1 + r) ** 3
         new_principal_incentives = loan_amount_incentives * (1 + r) ** 3
@@ -160,13 +159,13 @@ with tab_customer:
         payment_itc = abs(pmt(r, n, loan_amount_itc))
         payment_incentives = abs(pmt(r, n, loan_amount_incentives))
 
-    # Breakdown of payments for each period:
-    # Months 1-3: if deferral, these are 0; otherwise, the uniform payment.
+    # Breakdown of payments by period:
+    # Months 1-3: if deferral is selected, these are 0; else the standard payment.
     no_incentives_1_3 = 0 if deferral_option else payment_no_incentives
     itc_1_3 = 0 if deferral_option else payment_itc
     itc_nys_nyc_1_3 = 0 if deferral_option else payment_incentives
 
-    # For all other periods, we use the same calculated payment.
+    # For subsequent periods, we assume the payment is uniform.
     no_incentives_4_18 = payment_no_incentives
     no_incentives_y2 = payment_no_incentives
     no_incentives_y3 = payment_no_incentives
@@ -188,37 +187,30 @@ with tab_customer:
     total_tax_incentives_val = itc_val + nys_credit_val + nyc_abatement_val
     net_investment_val = loan_amount_customer - total_tax_incentives_val
 
-    annual_savings = electric_bill * 12  # Annual savings from monthly electric bill
+    annual_savings = electric_bill * 12
 
     # Dynamically calculate Total 25-Year Net Savings (example formula)
     total_25yr_net_savings = annual_savings * 25 - loan_amount_customer
 
-    loan_term_years = 25
-    loan_apr_val = loan_apr_cust
-
     # ---------------------------
-    # Render the PDF-like Lease/Loan Output Layout using components.html
+    # Render PDF-like Output using components.html
     # ---------------------------
     html_block = textwrap.dedent(f"""
     <div style="display: flex; flex-direction: column; font-family: Arial, sans-serif; color: #333;">
-
       <!-- Header Section -->
       <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-        <!-- Left side: Company name & investment overview -->
         <div>
           <h2 style="margin: 0;">MpowerSOLAR</h2>
           <p style="margin: 0; font-size: 14px;">
             Investment Overview prepared for <strong>{customer_name}</strong> on {current_date_str}
           </p>
         </div>
-        <!-- Right side: Loan info -->
         <div style="text-align: right;">
-          <p style="margin: 0;">Loan Term {loan_term_years} Years</p>
+          <p style="margin: 0;">Loan Term {loan_term_cust} Years</p>
           <p style="margin: 0;">AUTOPAY</p>
-          <p style="margin: 0;">APR {loan_apr_val:.2f}%</p>
+          <p style="margin: 0;">APR {loan_apr_cust:.2f}%</p>
         </div>
       </div>
-
       <div style="display: flex; justify-content: space-between;">
         <!-- Left Column: Investment Details -->
         <div style="width: 48%;">
@@ -275,7 +267,6 @@ with tab_customer:
             <li>Roof repairs, minor electric work &amp; construction included</li>
           </ul>
         </div>
-
         <!-- Right Column: Savings Overview -->
         <div style="width: 48%;">
           <h3>Savings Overview</h3>
@@ -301,10 +292,10 @@ with tab_customer:
                 <th></th>
                 <th>Months<br/>1-3</th>
                 <th>Months<br/>4-18</th>
-                <th>Year<br/>2<br/>(M 19-24)</th>
-                <th>Year<br/>3<br/>(M 25-36)</th>
-                <th>Year<br/>4<br/>(M 37-48)</th>
-                <th>Year<br/>5+<br/>(M 49+)</th>
+                <th>Year 2<br/>(M 19-24)</th>
+                <th>Year 3<br/>(M 25-36)</th>
+                <th>Year 4<br/>(M 37-48)</th>
+                <th>Year 5+<br/>(M 49+)</th>
               </tr>
             </thead>
             <tbody>
@@ -360,7 +351,7 @@ with tab_customer:
     </div>
     """).strip()
 
-    # Render the HTML content using components.html with a set height.
+    # Render the HTML content in an iframe
     components.html(html_block, height=800)
 
     # ---------------------------
@@ -409,7 +400,6 @@ with tab_customer:
 # =============================================================================
 with tab_company:
     st.markdown("### Company Facing Data")
-    # Company-facing loan program selection (independent from customer selection)
     loan_profiles_list_comp = [
         (25, 4.49, 35.99),
         (25, 4.99, 33.49),
@@ -451,13 +441,11 @@ with tab_company:
     selected_loan_key_comp = st.selectbox("Select Company Loan Program", list(loan_profiles_comp.keys()))
     loan_term_comp, loan_apr_comp, dealer_fee_comp = loan_profiles_comp[selected_loan_key_comp]
     
-    # Calculate base cost (without discount) then apply discount to both base and gross costs
     base_cost = cost_per_watt * 1000 * system_size_kw - battery_cost
     discounted_base_cost = base_cost * (1 - project_discount_pct / 100)
     gross_cost = base_cost / (1 - (dealer_fee_comp / 100))
     discounted_gross_cost = gross_cost * (1 - project_discount_pct / 100)
     
-    # Company revenue defined as margin on the project
     company_revenue = discounted_gross_cost - discounted_base_cost
 
     if lease_eligible == "no":
