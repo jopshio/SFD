@@ -12,10 +12,9 @@ import textwrap
 # ---------------------------
 st.set_page_config(page_title="Combined Solar Dashboard", layout="wide")
 st.title("Combined Solar Dashboard")
-
 st.markdown("""
 <div style="width:100%; overflow:hidden;">
-  <img src="https://raw.githubusercontent.com/jopshio/sfd/main/Logo.png" style="width:100%; max-height:200px; object-fit: contain;">
+  <img src="https://raw.githubusercontent.com/jopshio/sfd/main/Logo.png" style="width:200%; max-height:200px; object-fit: contain;">
 </div>
 """, unsafe_allow_html=True)
 # ---------------------------
@@ -37,10 +36,10 @@ incentives_toggle = st.sidebar.selectbox("Incentives Applied?", ["yes", "no"])
 scope_of_work = st.sidebar.text_area("Scope of Work", "Roof, Panel Upgrade")
 include_incentives = st.sidebar.checkbox("Include Incentives in Cash Flow", value=True)
 
-# Add a slider to discount the entire project cost
+# Discount slider
 project_discount_pct = st.sidebar.slider("Project Discount (%)", min_value=0, max_value=100, value=0, step=1)
 
-# Add a checkbox for 3-month payment deferral option
+# 3-month payment deferral option
 deferral_option = st.sidebar.checkbox("3-Month Payment Deferral", value=True)
 
 # ---------------------------
@@ -103,11 +102,11 @@ with tab_customer:
     discounted_project_cost = (base_price + roof_cost) * (1 - project_discount_pct / 100)
     nys_incentive = system_size_kw * 1000 * 0.2
 
-    # Use the discounted project cost for financing and cash purchase calculations
+    # Use discounted project cost as loan amount for customer calculations
     loan_amount_customer = discounted_project_cost
     monthly_payment_selected = abs(pmt(loan_apr_cust / 100 / 12, loan_term_cust * 12, loan_amount_customer))
 
-    # Calculate cash purchase using the discounted project cost
+    # Cash purchase calculation (example)
     cash = {
         'Total Cost': discounted_project_cost - nys_incentive,
         'Monthly Savings': round(electric_bill, 2),
@@ -128,61 +127,74 @@ with tab_customer:
     }
 
     # ---------------------------
-    # Calculate Payment Schedules Based on Inputs
+    # Payment Schedule Calculations
     # ---------------------------
     current_date_str = datetime.date.today().strftime("%b %d, %Y")
-    system_cost = base_price  # System cost (before discount)
-    spring_discount = roof_cost  # Using roof_cost as the "Spring Discount"
-    itc_val = system_cost * 0.30  # 30% Federal Tax Credit (ITC)
-    nys_credit_val = 5000         # Could be dynamic
-    nyc_abatement_val = 34356     # Could be dynamic
+    system_cost = base_price                # System cost before discount
+    spring_discount = roof_cost             # "Spring Discount" value (using roof_cost)
+    itc_val = system_cost * 0.30             # 30% Federal Tax Credit (ITC)
+    nys_credit_val = 5000                   # State Tax Credit (could be dynamic)
+    nyc_abatement_val = 34356               # NYC Abatement (could be dynamic)
 
-    # Calculate loan amounts for each scenario:
+    # Loan amounts for each scenario:
     loan_amount_no_incentives = loan_amount_customer
     loan_amount_itc = loan_amount_customer - itc_val
     loan_amount_incentives = loan_amount_customer - (itc_val + nys_credit_val + nyc_abatement_val)
 
     # Loan parameters
-    r = loan_apr_cust / 100 / 12  # Monthly interest rate
-    n = loan_term_cust * 12       # Total number of months
+    r = loan_apr_cust / 100 / 12            # Monthly interest rate
+    n = loan_term_cust * 12                 # Total number of months
 
-    # Compute monthly payments using the pmt function
-    monthly_payment_no_incentives = abs(pmt(r, n, loan_amount_no_incentives))
-    monthly_payment_itc = abs(pmt(r, n, loan_amount_itc))
-    monthly_payment_incentives = abs(pmt(r, n, loan_amount_incentives))
+    # For each scenario, recalc payment based on deferral:
+    if deferral_option:
+        # New principal after 3 months of accrued interest:
+        new_principal_no_incentives = loan_amount_no_incentives * (1 + r) ** 3
+        new_principal_itc = loan_amount_itc * (1 + r) ** 3
+        new_principal_incentives = loan_amount_incentives * (1 + r) ** 3
+        remaining_term = n - 3
+        payment_no_incentives = abs(pmt(r, remaining_term, new_principal_no_incentives))
+        payment_itc = abs(pmt(r, remaining_term, new_principal_itc))
+        payment_incentives = abs(pmt(r, remaining_term, new_principal_incentives))
+    else:
+        payment_no_incentives = abs(pmt(r, n, loan_amount_no_incentives))
+        payment_itc = abs(pmt(r, n, loan_amount_itc))
+        payment_incentives = abs(pmt(r, n, loan_amount_incentives))
 
-    # Apply 3-month deferral if selected (first 3 months are 0)
-    no_incentives_1_3 = 0 if deferral_option else monthly_payment_no_incentives
-    no_incentives_4_18 = monthly_payment_no_incentives
-    no_incentives_y2 = monthly_payment_no_incentives
-    no_incentives_y3 = monthly_payment_no_incentives
-    no_incentives_y4 = monthly_payment_no_incentives
-    no_incentives_y5plus = monthly_payment_no_incentives
+    # Breakdown of payments for each period:
+    # Months 1-3: if deferral, these are 0; otherwise, the uniform payment.
+    no_incentives_1_3 = 0 if deferral_option else payment_no_incentives
+    itc_1_3 = 0 if deferral_option else payment_itc
+    itc_nys_nyc_1_3 = 0 if deferral_option else payment_incentives
 
-    itc_1_3 = 0 if deferral_option else monthly_payment_itc
-    itc_4_18 = monthly_payment_itc
-    itc_y2 = monthly_payment_itc
-    itc_y3 = monthly_payment_itc
-    itc_y4 = monthly_payment_itc
-    itc_y5plus = monthly_payment_itc
+    # For all other periods, we use the same calculated payment.
+    no_incentives_4_18 = payment_no_incentives
+    no_incentives_y2 = payment_no_incentives
+    no_incentives_y3 = payment_no_incentives
+    no_incentives_y4 = payment_no_incentives
+    no_incentives_y5plus = payment_no_incentives
 
-    itc_nys_nyc_1_3 = 0 if deferral_option else monthly_payment_incentives
-    itc_nys_nyc_4_18 = monthly_payment_incentives
-    itc_nys_nyc_y2 = monthly_payment_incentives
-    itc_nys_nyc_y3 = monthly_payment_incentives
-    itc_nys_nyc_y4 = monthly_payment_incentives
-    itc_nys_nyc_y5plus = monthly_payment_incentives
+    itc_4_18 = payment_itc
+    itc_y2 = payment_itc
+    itc_y3 = payment_itc
+    itc_y4 = payment_itc
+    itc_y5plus = payment_itc
+
+    itc_nys_nyc_4_18 = payment_incentives
+    itc_nys_nyc_y2 = payment_incentives
+    itc_nys_nyc_y3 = payment_incentives
+    itc_nys_nyc_y4 = payment_incentives
+    itc_nys_nyc_y5plus = payment_incentives
 
     total_tax_incentives_val = itc_val + nys_credit_val + nyc_abatement_val
     net_investment_val = loan_amount_customer - total_tax_incentives_val
 
-    annual_savings = electric_bill * 12  # Annual savings based on monthly electric bill
+    annual_savings = electric_bill * 12  # Annual savings from monthly electric bill
 
-    # Calculate the Total 25-Year Net Savings dynamically.
+    # Dynamically calculate Total 25-Year Net Savings (example formula)
     total_25yr_net_savings = annual_savings * 25 - loan_amount_customer
 
-    loan_term_years = 25  # For header display
-    loan_apr_val = loan_apr_cust  # Using customer-selected APR
+    loan_term_years = 25
+    loan_apr_val = loan_apr_cust
 
     # ---------------------------
     # Render the PDF-like Lease/Loan Output Layout using components.html
@@ -199,7 +211,6 @@ with tab_customer:
             Investment Overview prepared for <strong>{customer_name}</strong> on {current_date_str}
           </p>
         </div>
-
         <!-- Right side: Loan info -->
         <div style="text-align: right;">
           <p style="margin: 0;">Loan Term {loan_term_years} Years</p>
@@ -212,7 +223,6 @@ with tab_customer:
         <!-- Left Column: Investment Details -->
         <div style="width: 48%;">
           <h3>Investment Details</h3>
-          
           <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
             <tr>
               <td colspan="2" style="padding: 4px 0;"><strong>BASIC LOAN INFORMATION</strong></td>
@@ -256,7 +266,6 @@ with tab_customer:
               <td style="padding: 4px 0; text-align: right;">${net_investment_val:,.0f}</td>
             </tr>
           </table>
-
           <br/>
           <h4 style="margin-bottom: 8px;">Added Benefits</h4>
           <ul style="margin-top: 0; font-size: 14px;">
@@ -270,7 +279,6 @@ with tab_customer:
         <!-- Right Column: Savings Overview -->
         <div style="width: 48%;">
           <h3>Savings Overview</h3>
-          
           <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
             <tr>
               <td style="padding: 4px 0;">Utility w/o Mpower Solar</td>
@@ -285,7 +293,6 @@ with tab_customer:
               <td style="padding: 4px 0; text-align: right;">$250/mo</td>
             </tr>
           </table>
-
           <br/>
           <p style="font-weight: bold; margin-bottom: 4px;">Est. Monthly Payment with Incentive Paydown</p>
           <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
@@ -294,10 +301,10 @@ with tab_customer:
                 <th></th>
                 <th>Months<br/>1-3</th>
                 <th>Months<br/>4-18</th>
-                <th>Year<br/>2</th>
-                <th>Year<br/>3</th>
-                <th>Year<br/>4</th>
-                <th>Year<br/>5+</th>
+                <th>Year<br/>2<br/>(M 19-24)</th>
+                <th>Year<br/>3<br/>(M 25-36)</th>
+                <th>Year<br/>4<br/>(M 37-48)</th>
+                <th>Year<br/>5+<br/>(M 49+)</th>
               </tr>
             </thead>
             <tbody>
@@ -330,7 +337,6 @@ with tab_customer:
               </tr>
             </tbody>
           </table>
-
           <br/>
           <h4 style="margin-bottom: 4px;">TOTAL 25-YEAR NET SAVINGS</h4>
           <h2 style="margin-top: 0;">${total_25yr_net_savings:,.0f}</h2>
@@ -339,7 +345,6 @@ with tab_customer:
           </p>
         </div>
       </div>
-
       <br/>
       <p style="font-size: 12px; line-height: 1.4;">
         1 Not everyone is qualified for credits, incentives, or rebates. Please consult your tax professional or legal professional for further information.
@@ -352,11 +357,10 @@ with tab_customer:
         <br/>
         5 The projected total 25-year net savings assumes a 4% annual utility escalator.
       </p>
-
     </div>
     """).strip()
 
-    # Render the HTML using components.html with an appropriate height
+    # Render the HTML content using components.html with a set height.
     components.html(html_block, height=800)
 
     # ---------------------------
