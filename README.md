@@ -17,14 +17,14 @@ Interactive Streamlit app for simulating solar proposal outcomes including loan 
 
 ```bash
 pip install -r requirements.txt
-streamlit run solar_finance_dashboard.py
+streamlit run sfd.py
 ```
 
 ## 🌐 Deploy via Streamlit Cloud
 
 1. Push this repo to GitHub
 2. Go to [streamlit.io/cloud](https://streamlit.io/cloud)
-3. Connect your repo and deploy `solar_finance_dashboard.py`
+3. Connect your repo and deploy `sfd.py`
 
 ---
 
