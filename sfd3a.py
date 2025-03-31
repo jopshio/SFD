@@ -11,7 +11,13 @@ st.set_page_config(page_title="Combined Solar Dashboard", layout="wide")
 st.title("Combined Solar Dashboard")
 
 st.markdown(st.image("https://raw.githubusercontent.com/jopshio/sfd/main/Logo.png", use_container_width=True)
-)
+            
+st.markdown("""
+<div style="width:100%; overflow:hidden;">
+  <img src="https://raw.githubusercontent.com/jopshio/sfd/main/Logo.png" style="width:100%; max-height:200px; object-fit: contain;">
+</div>
+""", unsafe_allow_html=True)
+
 
 # ---------------------------
 # Sidebar: Shared Input Parameters
