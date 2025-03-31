@@ -10,6 +10,12 @@ from numpy_financial import pmt, irr, npv
 st.set_page_config(page_title="Combined Solar Dashboard", layout="wide")
 st.title("Combined Solar Dashboard")
 
+st.markdown("""
+<div style="width:100%; overflow:hidden;">
+  <img src="banner.png" style="width:100%; height:auto;">
+</div>
+""", unsafe_allow_html=True)
+
 # ---------------------------
 # Sidebar: Shared Input Parameters
 # ---------------------------
