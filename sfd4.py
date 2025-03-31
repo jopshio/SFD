@@ -182,177 +182,179 @@ with tab_customer:
     # ---------------------------
     # Render the PDF-like Lease/Loan Output Layout
     # ---------------------------
-    st.markdown("<div style='color: red;'>Hello World</div>", unsafe_allow_html=True)
-    st.markdown(f"""
-    <div style="display: flex; flex-direction: column; font-family: Arial, sans-serif; color: #333;">
+import textwrap
 
-      <!-- Header Section -->
-      <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-        <!-- Left side: Company name & investment overview -->
-        <div>
-          <h2 style="margin: 0;">MpowerSOLAR</h2>
-          <p style="margin: 0; font-size: 14px;">
-            Investment Overview prepared for <strong>{customer_name}</strong> on {current_date_str}
-          </p>
-        </div>
+html_block = textwrap.dedent(f"""
+<div style="display: flex; flex-direction: column; font-family: Arial, sans-serif; color: #333;">
 
-        <!-- Right side: Loan info -->
-        <div style="text-align: right;">
-          <p style="margin: 0;">Loan Term {loan_term_years} Years</p>
-          <p style="margin: 0;">AUTOPAY</p>
-          <p style="margin: 0;">APR {loan_apr_val:.2f}%</p>
-        </div>
-      </div>
+  <!-- Header Section -->
+  <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+    <!-- Left side: Company name & investment overview -->
+    <div>
+      <h2 style="margin: 0;">MpowerSOLAR</h2>
+      <p style="margin: 0; font-size: 14px;">
+        Investment Overview prepared for <strong>{customer_name}</strong> on {current_date_str}
+      </p>
+    </div>
 
-      <div style="display: flex; justify-content: space-between;">
-        <!-- Left Column: Investment Details -->
-        <div style="width: 48%;">
-          <h3>Investment Details</h3>
-          
-          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-            <tr>
-              <td colspan="2" style="padding: 4px 0;"><strong>BASIC LOAN INFORMATION</strong></td>
-            </tr>
-            <tr>
-              <td style="padding: 4px 0;">System Cost</td>
-              <td style="padding: 4px 0; text-align: right;">${system_cost:,.0f}</td>
-            </tr>
-            <tr>
-              <td style="padding: 4px 0;">Spring Discount</td>
-              <td style="padding: 4px 0; text-align: right;">${spring_discount:,.0f}</td>
-            </tr>
+    <!-- Right side: Loan info -->
+    <div style="text-align: right;">
+      <p style="margin: 0;">Loan Term {loan_term_years} Years</p>
+      <p style="margin: 0;">AUTOPAY</p>
+      <p style="margin: 0;">APR {loan_apr_val:.2f}%</p>
+    </div>
+  </div>
 
-            <tr>
-              <td colspan="2" style="padding: 8px 0;"><strong>INCENTIVES</strong></td>
-            </tr>
-            <tr>
-              <td style="padding: 4px 0;">30% Federal Tax Credit (ITC)</td>
-              <td style="padding: 4px 0; text-align: right;">${itc_val:,.0f}</td>
-            </tr>
-            <tr>
-              <td style="padding: 4px 0;">State Tax Credit (NYS)</td>
-              <td style="padding: 4px 0; text-align: right;">${nys_credit_val:,.0f}</td>
-            </tr>
-            <tr>
-              <td style="padding: 4px 0;">Property Tax Abatement (NYC)</td>
-              <td style="padding: 4px 0; text-align: right;">${nyc_abatement_val:,.0f}</td>
-            </tr>
+  <div style="display: flex; justify-content: space-between;">
+    <!-- Left Column: Investment Details -->
+    <div style="width: 48%;">
+      <h3>Investment Details</h3>
+      
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <tr>
+          <td colspan="2" style="padding: 4px 0;"><strong>BASIC LOAN INFORMATION</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 0;">System Cost</td>
+          <td style="padding: 4px 0; text-align: right;">${system_cost:,.0f}</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 0;">Spring Discount</td>
+          <td style="padding: 4px 0; text-align: right;">${spring_discount:,.0f}</td>
+        </tr>
 
-            <tr>
-              <td colspan="2" style="padding: 8px 0;"><strong>TOTAL INVESTMENT</strong></td>
-            </tr>
-            <tr>
-              <td style="padding: 4px 0;">Total Loan Amount</td>
-              <td style="padding: 4px 0; text-align: right;">${loan_amount_customer:,.0f}</td>
-            </tr>
-            <tr>
-              <td style="padding: 4px 0;">Total Tax Incentives</td>
-              <td style="padding: 4px 0; text-align: right;">${total_tax_incentives_val:,.0f}</td>
-            </tr>
-            <tr>
-              <td style="padding: 4px 0;">Net Investment</td>
-              <td style="padding: 4px 0; text-align: right;">${net_investment_val:,.0f}</td>
-            </tr>
-          </table>
+        <tr>
+          <td colspan="2" style="padding: 8px 0;"><strong>INCENTIVES</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 0;">30% Federal Tax Credit (ITC)</td>
+          <td style="padding: 4px 0; text-align: right;">${itc_val:,.0f}</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 0;">State Tax Credit (NYS)</td>
+          <td style="padding: 4px 0; text-align: right;">${nys_credit_val:,.0f}</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 0;">Property Tax Abatement (NYC)</td>
+          <td style="padding: 4px 0; text-align: right;">${nyc_abatement_val:,.0f}</td>
+        </tr>
 
-          <br/>
-          <h4 style="margin-bottom: 8px;">Added Benefits</h4>
-          <ul style="margin-top: 0; font-size: 14px;">
-            <li>No up-front fees</li>
-            <li>No payment for first 3 months</li>
-            <li>Referral Bonus: $1,000</li>
-            <li>Roof repairs, minor electric work &amp; construction included</li>
-          </ul>
-        </div>
-
-        <!-- Right Column: Savings Overview -->
-        <div style="width: 48%;">
-          <h3>Savings Overview</h3>
-          
-          <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-            <tr>
-              <td style="padding: 4px 0;">Utility w/o Mpower Solar</td>
-              <td style="padding: 4px 0; text-align: right;">${electric_bill}/mo</td>
-            </tr>
-            <tr>
-              <td style="padding: 4px 0;">Utility w/ Mpower Solar</td>
-              <td style="padding: 4px 0; text-align: right;">$41 per meter</td>
-            </tr>
-            <tr>
-              <td style="padding: 4px 0;">All Incentives Applied After 5 Years</td>
-              <td style="padding: 4px 0; text-align: right;">$250/mo</td>
-            </tr>
-          </table>
-
-          <br/>
-          <p style="font-weight: bold; margin-bottom: 4px;">Est. Monthly Payment with Incentive Paydown</p>
-          <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
-            <thead>
-              <tr style="background-color: #f0f0f0;">
-                <th></th>
-                <th>Months<br/>1-3</th>
-                <th>Months<br/>4-18</th>
-                <th>Year<br/>2</th>
-                <th>Year<br/>3</th>
-                <th>Year<br/>4</th>
-                <th>Year<br/>5+</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>No Incentives</td>
-                <td>${no_incentives_1_3:,.0f}</td>
-                <td>${no_incentives_4_18:,.0f}</td>
-                <td>${no_incentives_y2:,.0f}</td>
-                <td>${no_incentives_y3:,.0f}</td>
-                <td>${no_incentives_y4:,.0f}</td>
-                <td>${no_incentives_y5plus:,.0f}</td>
-              </tr>
-              <tr>
-                <td>ITC</td>
-                <td>${itc_1_3:,.0f}</td>
-                <td>${itc_4_18:,.0f}</td>
-                <td>${itc_y2:,.0f}</td>
-                <td>${itc_y3:,.0f}</td>
-                <td>${itc_y4:,.0f}</td>
-                <td>${itc_y5plus:,.0f}</td>
-              </tr>
-              <tr>
-                <td>ITC + NYS + NYC</td>
-                <td>${itc_nys_nyc_1_3:,.0f}</td>
-                <td>${itc_nys_nyc_4_18:,.0f}</td>
-                <td>${itc_nys_nyc_y2:,.0f}</td>
-                <td>${itc_nys_nyc_y3:,.0f}</td>
-                <td>${itc_nys_nyc_y4:,.0f}</td>
-                <td>${itc_nys_nyc_y5plus:,.0f}</td>
-              </tr>
-            </tbody>
-          </table>
-
-          <br/>
-          <h4 style="margin-bottom: 4px;">TOTAL 25-YEAR NET SAVINGS</h4>
-          <h2 style="margin-top: 0;">${total_25yr_net_savings:,.0f}</h2>
-          <p style="font-size: 12px;">
-            This proposal expires 15 days from the date generated unless otherwise stipulated by Mpower Solar
-          </p>
-        </div>
-      </div>
+        <tr>
+          <td colspan="2" style="padding: 8px 0;"><strong>TOTAL INVESTMENT</strong></td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 0;">Total Loan Amount</td>
+          <td style="padding: 4px 0; text-align: right;">${loan_amount_customer:,.0f}</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 0;">Total Tax Incentives</td>
+          <td style="padding: 4px 0; text-align: right;">${total_tax_incentives_val:,.0f}</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 0;">Net Investment</td>
+          <td style="padding: 4px 0; text-align: right;">${net_investment_val:,.0f}</td>
+        </tr>
+      </table>
 
       <br/>
-      <p style="font-size: 12px; line-height: 1.4;">
-        1 Not everyone is qualified for credits, incentives, or rebates. Please consult your tax professional or legal professional for further information.
-        <br/>
-        2 The timing for receipt of the NYC Tax Credit may vary. While we assist with submissions, we cannot guarantee specific timelines; consult your tax advisor for details.
-        <br/>
-        3 The above payment is based on receipt of your timely Incentive Payments and successful enrollment in Autopay/ACH payments as stated in the loan agreement.
-        <br/>
-        4 A minimum of Two Thousand Five Hundred Dollars ($2,500) is required for loan re-amortization or principal pay-down after month 18.
-        <br/>
-        5 The projected total 25-year net savings assumes a 4% annual utility escalator.
-      </p>
-
+      <h4 style="margin-bottom: 8px;">Added Benefits</h4>
+      <ul style="margin-top: 0; font-size: 14px;">
+        <li>No up-front fees</li>
+        <li>No payment for first 3 months</li>
+        <li>Referral Bonus: $1,000</li>
+        <li>Roof repairs, minor electric work &amp; construction included</li>
+      </ul>
     </div>
-    """, unsafe_allow_html=True)
+
+    <!-- Right Column: Savings Overview -->
+    <div style="width: 48%;">
+      <h3>Savings Overview</h3>
+      
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+        <tr>
+          <td style="padding: 4px 0;">Utility w/o Mpower Solar</td>
+          <td style="padding: 4px 0; text-align: right;">${electric_bill}/mo</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 0;">Utility w/ Mpower Solar</td>
+          <td style="padding: 4px 0; text-align: right;">$41 per meter</td>
+        </tr>
+        <tr>
+          <td style="padding: 4px 0;">All Incentives Applied After 5 Years</td>
+          <td style="padding: 4px 0; text-align: right;">$250/mo</td>
+        </tr>
+      </table>
+
+      <br/>
+      <p style="font-weight: bold; margin-bottom: 4px;">Est. Monthly Payment with Incentive Paydown</p>
+      <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
+        <thead>
+          <tr style="background-color: #f0f0f0;">
+            <th></th>
+            <th>Months<br/>1-3</th>
+            <th>Months<br/>4-18</th>
+            <th>Year<br/>2</th>
+            <th>Year<br/>3</th>
+            <th>Year<br/>4</th>
+            <th>Year<br/>5+</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>No Incentives</td>
+            <td>${no_incentives_1_3:,.0f}</td>
+            <td>${no_incentives_4_18:,.0f}</td>
+            <td>${no_incentives_y2:,.0f}</td>
+            <td>${no_incentives_y3:,.0f}</td>
+            <td>${no_incentives_y4:,.0f}</td>
+            <td>${no_incentives_y5plus:,.0f}</td>
+          </tr>
+          <tr>
+            <td>ITC</td>
+            <td>${itc_1_3:,.0f}</td>
+            <td>${itc_4_18:,.0f}</td>
+            <td>${itc_y2:,.0f}</td>
+            <td>${itc_y3:,.0f}</td>
+            <td>${itc_y4:,.0f}</td>
+            <td>${itc_y5plus:,.0f}</td>
+          </tr>
+          <tr>
+            <td>ITC + NYS + NYC</td>
+            <td>${itc_nys_nyc_1_3:,.0f}</td>
+            <td>${itc_nys_nyc_4_18:,.0f}</td>
+            <td>${itc_nys_nyc_y2:,.0f}</td>
+            <td>${itc_nys_nyc_y3:,.0f}</td>
+            <td>${itc_nys_nyc_y4:,.0f}</td>
+            <td>${itc_nys_nyc_y5plus:,.0f}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br/>
+      <h4 style="margin-bottom: 4px;">TOTAL 25-YEAR NET SAVINGS</h4>
+      <h2 style="margin-top: 0;">${total_25yr_net_savings:,.0f}</h2>
+      <p style="font-size: 12px;">
+        This proposal expires 15 days from the date generated unless otherwise stipulated by Mpower Solar
+      </p>
+    </div>
+  </div>
+
+  <br/>
+  <p style="font-size: 12px; line-height: 1.4;">
+    1 Not everyone is qualified for credits, incentives, or rebates. Please consult your tax professional or legal professional for further information.
+    <br/>
+    2 The timing for receipt of the NYC Tax Credit may vary. While we assist with submissions, we cannot guarantee specific timelines; consult your tax advisor for details.
+    <br/>
+    3 The above payment is based on receipt of your timely Incentive Payments and successful enrollment in Autopay/ACH payments as stated in the loan agreement.
+    <br/>
+    4 A minimum of Two Thousand Five Hundred Dollars ($2,500) is required for loan re-amortization or principal pay-down after month 18.
+    <br/>
+    5 The projected total 25-year net savings assumes a 4% annual utility escalator.
+  </p>
+
+</div>
+""", unsafe_allow_html=True)
+
 
     # Other outputs: Customer Inputs, Output Summary, Cash Purchase, Lease Option, etc.
     st.subheader("Customer Inputs")
