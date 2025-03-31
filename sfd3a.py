@@ -10,11 +10,8 @@ from numpy_financial import pmt, irr, npv
 st.set_page_config(page_title="Combined Solar Dashboard", layout="wide")
 st.title("Combined Solar Dashboard")
 
-st.markdown("""
-<div style="width:100%; overflow:hidden;">
-  <img src="Logo.png" style="width:100%; height:auto;">
-</div>
-""", unsafe_allow_html=True)
+st.markdown(st.image("https://raw.githubusercontent.com/jopshio/sfd/main/Logo.png", use_column_width=True)
+)
 
 # ---------------------------
 # Sidebar: Shared Input Parameters
