@@ -352,8 +352,8 @@ html_block = textwrap.dedent(f"""
     5 The projected total 25-year net savings assumes a 4% annual utility escalator.
   </p>
 
-</div>
-""", unsafe_allow_html=True)
+    </div>
+    """, unsafe_allow_html=True)
 
 
     # Other outputs: Customer Inputs, Output Summary, Cash Purchase, Lease Option, etc.
