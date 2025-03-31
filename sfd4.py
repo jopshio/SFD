@@ -1,4 +1,5 @@
 import streamlit as st
+import streamlit.components.v1 as components
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -179,7 +180,7 @@ with tab_customer:
     loan_apr_val = loan_apr_cust  # Using customer-selected APR
 
     # ---------------------------
-    # Render the PDF-like Lease/Loan Output Layout using dedent
+    # Render the PDF-like Lease/Loan Output Layout using components.html
     # ---------------------------
     html_block = textwrap.dedent(f"""
     <div style="display: flex; flex-direction: column; font-family: Arial, sans-serif; color: #333;">
@@ -219,7 +220,6 @@ with tab_customer:
               <td style="padding: 4px 0;">Spring Discount</td>
               <td style="padding: 4px 0; text-align: right;">${spring_discount:,.0f}</td>
             </tr>
-
             <tr>
               <td colspan="2" style="padding: 8px 0;"><strong>INCENTIVES</strong></td>
             </tr>
@@ -235,7 +235,6 @@ with tab_customer:
               <td style="padding: 4px 0;">Property Tax Abatement (NYC)</td>
               <td style="padding: 4px 0; text-align: right;">${nyc_abatement_val:,.0f}</td>
             </tr>
-
             <tr>
               <td colspan="2" style="padding: 8px 0;"><strong>TOTAL INVESTMENT</strong></td>
             </tr>
@@ -350,10 +349,14 @@ with tab_customer:
       </p>
 
     </div>
-    """)
-    st.markdown(html_block, unsafe_allow_html=True)
+    """).strip()
 
-    # Other outputs: Customer Inputs, Output Summary, Cash Purchase, Lease Option, etc.
+    # Render the HTML using components.html with an appropriate height
+    components.html(html_block, height=800)
+
+    # ---------------------------
+    # Additional Outputs
+    # ---------------------------
     st.subheader("Customer Inputs")
     st.json({
         "Customer Name": customer_name,
