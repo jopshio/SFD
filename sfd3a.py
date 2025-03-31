@@ -10,7 +10,7 @@ from numpy_financial import pmt, irr, npv
 st.set_page_config(page_title="Combined Solar Dashboard", layout="wide")
 st.title("Combined Solar Dashboard")
 
-st.markdown(st.image("https://raw.githubusercontent.com/jopshio/sfd/main/Logo.png", use_container_width=True)
+# st.markdown(st.image("https://raw.githubusercontent.com/jopshio/sfd/main/Logo.png", use_container_width=True)
             
 st.markdown("""
 <div style="width:100%; overflow:hidden;">
